@@ -1,10 +1,41 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Callback</title>
+    <title>Callback</title>
+    <script>
+        // URLパラメータからコードを抽出
+        const params = new URLSearchParams(window.location.search);
+        const authorizationCode = params.get('code');
+
+        if (authorizationCode) {
+            // アクセストークンを取得するリクエストを送信
+            fetch('https://www.patreon.com/api/oauth2/token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    'grant_type': 'authorization_code',
+                    'code': authorizationCode,
+                    'client_id': 'YOUR_CLIENT_ID',
+                    'client_secret': 'YOUR_CLIENT_SECRET',
+                    'redirect_uri': 'https://teacup254.github.io/mysite/callback.html'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Token Info:', data);
+                // アクセストークンを表示する
+                document.getElementById('token').textContent = 'Access Token: ' + data.access_token;
+            })
+            .catch(error => console.error('Error:', error));
+        } else {
+            console.error('Authorization code not found');
+        }
+    </script>
 </head>
 <body>
-  <h1>Callback Page</h1>
-  <p>This is the callback page.</p>
+    <h1>Callback Page</h1>
+    <p id="token">Waiting for access token...</p>
 </body>
 </html>
